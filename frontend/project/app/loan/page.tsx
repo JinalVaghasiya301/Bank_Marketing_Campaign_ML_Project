@@ -5,49 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Users, 
-  Phone, 
-  Target, 
-  TrendingUp, 
-  TrendingDown, 
-  AlertTriangle, 
-  CheckCircle,
-  Calendar,
-  Clock,
-  DollarSign,
-  Shield,
-  Activity,
-  BarChart3,
-  PieChart,
-  Building,
-  CreditCard,
-  Home,
-  Zap
-} from 'lucide-react';
-
-interface PredictionResult {
-  prediction: string;
-  confidence: number;
-  probability_yes: number;
-  probability_no: number;
-  risk_score: number;
-  recommendation: string;
-  factors: string[];
-  success_rate: number;
-  dataset_info?: {
-    source: string;
-    instances: number;
-    features: number;
-    target: string;
-    model_features?: number;
-    validation?: string;
-  };
-}
+import { Users, Phone, Target, Shield, Building, CreditCard, Home, Zap, Calendar, Clock, DollarSign, AlertTriangle, BarChart3, PieChart } from 'lucide-react';
 
 export default function TermDepositPredictionPage() {
   const [formData, setFormData] = useState({
@@ -63,7 +22,7 @@ export default function TermDepositPredictionPage() {
     poutcome: 'unknown',
   });
 
-  const [result, setResult] = useState<PredictionResult | null>(null);
+  const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -173,7 +132,7 @@ export default function TermDepositPredictionPage() {
   const renderField = (field: any) => {
     const Icon = field.icon;
     return (
-      <div className="dark:bg-gray-800 bg-white rounded-xl p-6 shadow-lg dark:border-gray-700 border border-gray-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+      <div className="dark:bg-gray-800 bg-white rounded-xl p-6 shadow-lg dark:border-gray-700 border border-gray-200">
         <div className="flex items-center mb-4">
           <Icon className="h-5 w-5 mr-3 dark:text-blue-400 text-blue-600" />
           <label className="font-semibold text-lg dark:text-white text-gray-900">{field.label}</label>
@@ -184,17 +143,19 @@ export default function TermDepositPredictionPage() {
           <Select 
             value={formData[field.name as keyof typeof formData]} 
             onValueChange={(value) => {
-              const newData = {...formData};
-              newData[field.name as keyof typeof formData] = value;
-              setFormData(newData);
+              setFormData(prev => {
+                const newFormData = { ...prev };
+                (newFormData as any)[field.name] = value;
+                return newFormData;
+              });
             }}
           >
-            <SelectTrigger className="w-full dark:bg-gray-700 bg-white dark:border-gray-600 border-gray-300 dark:text-white focus:ring-2 focus:ring-blue-500">
+            <SelectTrigger className="w-full dark:bg-gray-700 bg-white dark:border-gray-600 border-gray-300 dark:text-white">
               <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
             </SelectTrigger>
             <SelectContent className="dark:bg-gray-800 bg-white dark:border-gray-700 border-gray-200">
               {field.options?.map((option: any) => (
-                <SelectItem key={option.value} value={option.value} className="dark:text-white dark:hover:bg-gray-700 text-gray-900 hover:bg-gray-100">
+                <SelectItem key={option.value} value={option.value} className="dark:text-white text-gray-900">
                   {option.label}
                 </SelectItem>
               ))}
@@ -204,13 +165,15 @@ export default function TermDepositPredictionPage() {
           <Input
             type={field.type}
             value={formData[field.name as keyof typeof formData]}
-            onChange={(e) => {
-              const newData = {...formData};
-              newData[field.name as keyof typeof formData] = e.target.value;
-              setFormData(newData);
+            onChange={(e: any) => {
+              setFormData(prev => {
+                const newFormData = { ...prev };
+                (newFormData as any)[field.name] = e.target.value;
+                return newFormData;
+              });
             }}
             placeholder={field.placeholder}
-            className="w-full dark:bg-gray-700 bg-white dark:border-gray-600 border-gray-300 dark:text-white focus:ring-2 focus:ring-blue-500"
+            className="w-full dark:bg-gray-700 bg-white dark:border-gray-600 border-gray-300 dark:text-white"
           />
         )}
       </div>
@@ -247,18 +210,12 @@ export default function TermDepositPredictionPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        
-        if (errorData.validation_errors) {
-          const validationMessage = errorData.validation_errors.join('\n• ');
-          throw new Error(`Validation Failed:\n• ${validationMessage}`);
-        }
-        
         throw new Error(errorData.error || 'Prediction failed');
       }
 
       const data = await response.json();
       
-      const result: PredictionResult = {
+      const result: any = {
         prediction: data.prediction || 'NO',
         confidence: data.confidence || 0,
         probability_yes: data.probability_yes || 0,
@@ -281,7 +238,6 @@ export default function TermDepositPredictionPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Hero Section */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center p-3 bg-blue-100 dark:bg-blue-900 rounded-full mb-6">
             <Zap className="h-8 w-8 text-blue-600 dark:text-blue-400" />
@@ -304,9 +260,7 @@ export default function TermDepositPredictionPage() {
           </div>
         </div>
 
-        {/* Main Content */}
         <div className="grid grid-cols-1 gap-8">
-          {/* Form Section - Customer Information Box */}
           <Card className="dark:bg-gray-800 bg-white dark:border-gray-700 border-gray-200 shadow-2xl">
             <CardHeader className="text-center pb-8 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-800 dark:to-purple-800">
               <CardTitle className="text-3xl font-bold text-white flex items-center justify-center">
@@ -319,42 +273,16 @@ export default function TermDepositPredictionPage() {
             </CardHeader>
             <CardContent className="px-8 pb-8">
               <form onSubmit={handleSubmit} className="space-y-12">
-                <Tabs defaultValue="client" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 dark:bg-gray-700 bg-gray-100 p-1 rounded-xl">
-                    <TabsTrigger 
-                      value="client" 
-                      className="text-lg font-medium dark:data-[state=active]:bg-gray-600 data-[state=active]:bg-white dark:text-white text-gray-900 rounded-lg transition-all data-[state=active]:shadow-lg"
-                    >
-                      <Users className="h-4 w-4 mr-2" />
-                      Customer Profile
-                    </TabsTrigger>
-                    <TabsTrigger 
-                      value="campaign" 
-                      className="text-lg font-medium dark:data-[state=active]:bg-gray-600 data-[state=active]:bg-white dark:text-white text-gray-900 rounded-lg transition-all data-[state=active]:shadow-lg"
-                    >
-                      <Target className="h-4 w-4 mr-2" />
-                      Campaign Details
-                    </TabsTrigger>
-                  </TabsList>
-
-                  <TabsContent value="client" className="space-y-8 mt-8">
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                      {clientFields.map(renderField)}
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="campaign" className="space-y-8 mt-8">
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                      {campaignFields.map(renderField)}
-                    </div>
-                  </TabsContent>
-                </Tabs>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {clientFields.map(renderField)}
+                  {campaignFields.map(renderField)}
+                </div>
 
                 <div className="flex justify-center pt-8">
                   <Button 
                     type="submit" 
                     disabled={loading}
-                    className="px-12 py-4 text-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+                    className="px-12 py-4 text-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl shadow-lg"
                   >
                     {loading ? (
                       <>
@@ -373,20 +301,17 @@ export default function TermDepositPredictionPage() {
             </CardContent>
           </Card>
 
-          {/* Error Alert */}
           {error && (
-            <Alert className="dark:bg-red-900/50 bg-red-50 dark:border-red-700 border-red-200 shadow-lg">
-              <AlertTriangle className="h-4 w-4 text-red-500" />
-              <AlertDescription className="dark:text-red-200 text-red-800">
-                {error}
-              </AlertDescription>
-            </Alert>
+            <div className="dark:bg-red-900/50 bg-red-50 dark:border-red-700 border-red-200 shadow-lg p-4 rounded-lg">
+              <div className="flex items-center">
+                <AlertTriangle className="h-4 w-4 text-red-500 mr-2" />
+                <span className="dark:text-red-200 text-red-800">{error}</span>
+              </div>
+            </div>
           )}
 
-          {/* Prediction Result - Complete Details */}
           {result && (
             <div className="space-y-8">
-              {/* Main Prediction Card */}
               <Card className="dark:bg-gray-800 bg-white dark:border-gray-700 border-gray-200 shadow-2xl overflow-hidden">
                 <div className={`bg-gradient-to-r p-8 text-center ${
                     result.prediction === 'YES' 
@@ -405,9 +330,7 @@ export default function TermDepositPredictionPage() {
                 </div>
               </Card>
 
-              {/* Detailed Results Grid */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Probability Distribution */}
                 <Card className="dark:bg-gray-800 bg-white dark:border-gray-700 border-gray-200 shadow-2xl">
                   <CardHeader>
                     <CardTitle className="text-xl font-bold dark:text-white text-gray-900 flex items-center">
@@ -422,20 +345,29 @@ export default function TermDepositPredictionPage() {
                           <span className="font-medium dark:text-green-400 text-green-600">Will Subscribe</span>
                           <span className="font-bold dark:text-green-400 text-green-600">{(result.probability_yes * 100).toFixed(1)}%</span>
                         </div>
-                        <Progress value={result.probability_yes * 100} className="h-3" />
+                        <div className="w-full bg-gray-200 rounded-full h-3">
+                          <div 
+                            className="bg-green-500 h-3 rounded-full" 
+                            style={{ width: `${result.probability_yes * 100}%` }}
+                          ></div>
+                        </div>
                       </div>
                       <div>
                         <div className="flex justify-between mb-2">
                           <span className="font-medium dark:text-red-400 text-red-600">Will Not Subscribe</span>
                           <span className="font-bold dark:text-red-400 text-red-600">{(result.probability_no * 100).toFixed(1)}%</span>
                         </div>
-                        <Progress value={result.probability_no * 100} className="h-3" />
+                        <div className="w-full bg-gray-200 rounded-full h-3">
+                          <div 
+                            className="bg-red-500 h-3 rounded-full" 
+                            style={{ width: `${result.probability_no * 100}%` }}
+                          ></div>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                {/* Risk Assessment */}
                 <Card className="dark:bg-gray-800 bg-white dark:border-gray-700 border-gray-200 shadow-2xl">
                   <CardHeader>
                     <CardTitle className="text-xl font-bold dark:text-white text-gray-900 flex items-center">
@@ -471,7 +403,6 @@ export default function TermDepositPredictionPage() {
                 </Card>
               </div>
 
-              {/* Key Factors */}
               <Card className="dark:bg-gray-800 bg-white dark:border-gray-700 border-gray-200 shadow-2xl">
                 <CardHeader>
                   <CardTitle className="text-xl font-bold dark:text-white text-gray-900 flex items-center">
@@ -484,7 +415,7 @@ export default function TermDepositPredictionPage() {
                 </CardHeader>
                 <CardContent className="p-6">
                   <div className="grid grid-cols-1 gap-4">
-                    {result.factors.map((factor, index) => (
+                    {result.factors.map((factor: string, index: number) => (
                       <div key={index} className="flex items-center p-4 dark:bg-gray-700 bg-gray-50 rounded-lg border dark:border-gray-600 border-gray-200 hover:shadow-md transition-shadow">
                         <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold mr-4">
                           {index + 1}
@@ -500,7 +431,6 @@ export default function TermDepositPredictionPage() {
                 </CardContent>
               </Card>
 
-              {/* Strategic Recommendation */}
               <Card className="dark:bg-gray-800 bg-white dark:border-gray-700 border-gray-200 shadow-2xl">
                 <CardHeader>
                   <CardTitle className="text-xl font-bold dark:text-white text-gray-900 flex items-center">
@@ -520,7 +450,6 @@ export default function TermDepositPredictionPage() {
                 </CardContent>
               </Card>
 
-              {/* Dataset Information */}
               {result.dataset_info && (
                 <Card className="dark:bg-gray-800 bg-white dark:border-gray-700 border-gray-200 shadow-2xl">
                   <CardHeader>
