@@ -324,13 +324,6 @@ export default function TermDepositPredictionPage() {
                   <div className="text-white/90 text-xl">
                     Will {result.prediction === 'YES' ? 'Subscribe' : 'Not Subscribe'} to Term Deposit
                   </div>
-                  <div className="mt-4 text-white/80 text-lg">
-<<<<<<< HEAD
-                    Confidence: {(result.confidence).toFixed(2)}%
-=======
-                    Confidence: {(result.confidence*100).toFixed(1)}%
->>>>>>> 316751d727dae341f55b94219e4897567e9d05df
-                  </div>
                 </div>
               </Card>
 
